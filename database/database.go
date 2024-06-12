@@ -26,4 +26,5 @@ func InitDB() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
 }

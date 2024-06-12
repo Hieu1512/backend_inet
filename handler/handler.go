@@ -15,14 +15,16 @@ func GetPage(c *fiber.Ctx) error {
 	return c.JSON(page)
 }
 func GetPageByKey(c *fiber.Ctx) error {
-	key := c.Query("key") // Lấy giá trị của tham số key từ query string
+	// Lấy key của trang cần lấy từ tham số trong URL
+	key := c.Params("key")
 
-	// Tìm trang có trường Key phù hợp trong cơ sở dữ liệu
+	// Tìm trang trong cơ sở dữ liệu theo key
 	var page model.Page2
 	if err := database.DB.Where("`key` = ?", key).First(&page).Error; err != nil {
 		return err
 	}
 
+	// Trả về dữ liệu trang tìm thấy
 	return c.JSON(page)
 }
 
@@ -37,17 +39,20 @@ func GetPageByKey(c *fiber.Ctx) error {
 
 func CreatePage(c *fiber.Ctx) error {
 	// Parse request body để tạo mới một page
-	var page model.Page2
-	if err := c.BodyParser(&page); err != nil {
+	var createdPage model.Page2
+	if err := c.BodyParser(&createdPage); err != nil {
 		return err
 	}
-
+	var existingPage model.Page2
+	if err := database.DB.Where("`key`= ?", createdPage.Key).First(&existingPage).Error; err == nil {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"thong bao": "Key da co"})
+	}
 	// Tạo mới page trong cơ sở dữ liệu
-	if err := database.DB.Create(&page).Error; err != nil {
+	if err := database.DB.Create(&createdPage).Error; err != nil {
 		return err
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(page)
+	return c.Status(fiber.StatusCreated).JSON(createdPage)
 }
 
 func UpdatePage(c *fiber.Ctx) error {

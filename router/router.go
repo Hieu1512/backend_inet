@@ -8,9 +8,9 @@ import (
 
 func SetupRoutes(app *fiber.App) {
 	app.Get("/page", handler.GetPage)
-	app.Get("/page/key", handler.GetPageByKey)
+	app.Get("/get/:key", handler.GetPageByKey)
 	// app.Get("/page/:id", handler.GetPage)
 	app.Post("/page", handler.CreatePage)
 	app.Patch("/page", handler.UpdatePage)
-	app.Delete("/page/:key", handler.DeletePageByKey)
+	app.Delete("/delete/:key", handler.DeletePageByKey)
 }
